@@ -11,8 +11,8 @@ class SplashController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
 
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
     Future.delayed(const Duration(seconds: 3)).then((value) async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       bool isLogin = prefs.getBool(PrefsConstant.loginStatus) ?? false;

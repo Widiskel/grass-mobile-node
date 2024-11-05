@@ -92,18 +92,17 @@ class NodeController extends GetxController {
     connectionText = "Connecting to Grass Server...!";
     isConnecting = true;
     update();
-    localNotificationService.showNotification(
-        "Grass Connection", "Connecting to Grass Server...!");
+    localNotificationService.showNotification("Connecting to Grass Server...!");
 
     channel = WebSocketChannel.connect(
-      Uri.parse('wss://proxy2.wynd.network:4650/'),
+      Uri.parse('wss://proxy2.wynd.network:4444/'),
     );
     await channel!.ready;
     isConnecting = false;
     isConnected = true;
     connectionText =
         "You’re doing great! Keep connected to this network to earn.";
-    localNotificationService.showNotification("Grass Connection",
+    localNotificationService.showNotification(
         "Connected. You’re doing great! Keep connected to this network to earn.");
     update();
 
@@ -114,8 +113,8 @@ class NodeController extends GetxController {
       onError: (error) {
         log("WSS WebSocket Error: $error");
         connectionText = "Connection error. Attempting to reconnect...";
-        localNotificationService.showNotification(
-            "Grass Connection", "Connection error. Attempting to reconnect...");
+        localNotificationService
+            .showNotification("Connection error. Attempting to reconnect...");
         isConnecting = false;
         isConnected = false;
         deviceIp = null;
@@ -127,8 +126,7 @@ class NodeController extends GetxController {
       },
       onDone: () {
         log("WSS WebSocket connection closed.");
-        localNotificationService.showNotification(
-            "Grass Connection", "Disconnecting....");
+        localNotificationService.showNotification("Disconnecting....");
         connectionText = "Connect to start earning.";
         isConnecting = false;
         isConnected = false;
@@ -143,8 +141,7 @@ class NodeController extends GetxController {
 
   Future<void> handleMessage(dynamic message) async {
     log("WSS Receiving message: $message");
-    localNotificationService.showNotification(
-        "Grass Connection", "Receiving Message : $message");
+    localNotificationService.showNotification("Receiving Message : $message");
     Map<String, dynamic> msg = jsonDecode(message);
     String action = msg["action"];
 
@@ -194,8 +191,7 @@ class NodeController extends GetxController {
       "data": {},
     };
     await sendMessage(jsonEncode(res));
-    localNotificationService.showNotification(
-        "Get Grass Connection", "PING Message sended");
+    localNotificationService.showNotification("PING Message sended");
   }
 
   void stopPing() {
@@ -214,18 +210,16 @@ class NodeController extends GetxController {
     };
     await sendMessage(jsonEncode(res));
     pongCount += 1;
-    localNotificationService.showNotification(
-        "Grass Connection", "You has response $pongCount x PONG");
+    localNotificationService
+        .showNotification("You has response $pongCount x PONG");
   }
 
   Future<void> sendMessage(String message) async {
-    localNotificationService.showNotification(
-        "Grass Connection", "Sending Message : $message");
+    localNotificationService.showNotification("Sending Message : $message");
     if (channel != null && isConnected) {
       channel?.sink.add(message);
       log("WSS Sent message: $message");
-      localNotificationService.showNotification(
-          "Grass Connection", "Message sent : $message");
+      localNotificationService.showNotification("Message sent : $message");
       if (currentDevice == null) {
         await getActiveDevices();
       }
@@ -241,13 +235,13 @@ class NodeController extends GetxController {
       _retryCount++;
       _reconnectTimer = Timer(Duration(seconds: _reconnectInterval), () {
         log("WSS Reconnection attempt #$_retryCount");
-        localNotificationService.showNotification(
-            "Grass Connection", "Reconnect attemnt $_retryCount");
+        localNotificationService
+            .showNotification("Reconnect attemnt $_retryCount");
         wssConnect();
       });
     } else {
       log("WSS Max reconnection attempts reached. Unable to reconnect.");
-      localNotificationService.showNotification("Grass Connection",
+      localNotificationService.showNotification(
           "Max reconnection attempts reached. Unable to reconnect");
       connectionText = "Connection lost. Please retry manually.";
       update();

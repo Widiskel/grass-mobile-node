@@ -1,12 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:grass/app/data/models/login_model.dart';
 import 'package:grass/app/data/utils/url.dart';
-import 'package:grass/app/widget/snackbar_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/utils/prefs_constant.dart';
 import '../routes/app_pages.dart';
@@ -123,8 +121,6 @@ class _WebViewWidgetState extends State<WebViewWidget> {
                     await controller.evaluateJavascript(
                         source: "navigator.userAgent") as String);
                 await prefs.setBool(PrefsConstant.loginStatus, true);
-                controller.dispose();
-                SuccessSnack.show(message: "Logged In");
                 Get.offAllNamed(Routes.HOME);
               }
             }
@@ -137,7 +133,6 @@ class _WebViewWidgetState extends State<WebViewWidget> {
                 await CookieManager.instance().deleteAllCookies();
                 await InAppWebViewController.clearAllCache();
                 controller.dispose();
-                SuccessSnack.show(message: "Logged Out");
                 Get.offAllNamed(Routes.LOGIN);
               }
             }

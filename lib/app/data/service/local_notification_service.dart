@@ -1,77 +1,90 @@
-import 'dart:developer';
-
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:get/get.dart';
 import 'package:grass/app/routes/app_pages.dart';
 
 class LocalNotificationService {
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-
   LocalNotificationService() {
     _initializeNotifications();
   }
 
   void _initializeNotifications() async {
-    _requestPermission();
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@drawable/ic_notification');
+    AwesomeNotifications().initialize(
+      'resource://drawable/ic_notification',
+      [
+        NotificationChannel(
+          channelGroupKey: 'grass node',
+          channelKey: 'grass',
+          channelName: 'Grass Notification',
+          channelDescription: 'Grass Websocket Notification',
+          importance: NotificationImportance.High,
+          playSound: false,
+          channelShowBadge: true,
+        ),
+      ],
+      debug: true,
+    );
 
-    const InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
+    await AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+      if (!isAllowed) {
+        AwesomeNotifications().requestPermissionToSendNotifications(
+            channelKey: "grass",
+            permissions: [
+              NotificationPermission.Alert,
+              NotificationPermission.Badge,
+            ]);
+      }
+    });
 
-    await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
+    AwesomeNotifications().setListeners(
+      onActionReceivedMethod: NotificationController.onActionReceivedMethod,
+      onNotificationCreatedMethod:
+          NotificationController.onNotificationCreatedMethod,
+      onNotificationDisplayedMethod:
+          NotificationController.onNotificationDisplayedMethod,
+      onDismissActionReceivedMethod:
+          NotificationController.onDismissActionReceivedMethod,
     );
   }
 
-  Future<void> _requestPermission() async {
-    final AndroidFlutterLocalNotificationsPlugin? androidPlatform =
-        flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
-
-    if (androidPlatform != null) {
-      await androidPlatform.requestNotificationsPermission();
-    }
-  }
-
-  void onDidReceiveNotificationResponse(
-      NotificationResponse notificationResponse) async {
-    final String? payload = notificationResponse.payload;
-    if (payload != null) {
-      log('Notification payload: $payload');
-      Get.toNamed(Routes.HOME);
-    }
-  }
-
-  Future<void> showNotification(String title, String body,
-      {String? payload}) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'grass',
-      'Grass Mobile',
-      channelDescription: 'Grass Websocket Notification',
-      importance: Importance.max,
-      priority: Priority.high,
-      showWhen: false,
-      ongoing: true,
-      autoCancel: false,
-    );
-
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-
-    await flutterLocalNotificationsPlugin.show(
-      0,
-      title,
-      body,
-      platformChannelSpecifics,
-      payload: payload,
+  Future<void> showNotification(String body, {String? payload}) async {
+    AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        channelKey: 'grass',
+        body: body,
+        locked: true,
+        displayOnBackground: true,
+        displayOnForeground: true,
+        autoDismissible: false,
+        notificationLayout: NotificationLayout.BigText,
+        payload: payload != null ? {'payload': payload} : null,
+        id: 0,
+        actionType: ActionType.Default,
+        category: NotificationCategory.Service,
+      ),
     );
   }
 
   Future<void> dismissNotification() async {
-    await flutterLocalNotificationsPlugin.cancel(0);
+    await AwesomeNotifications().cancelAll();
+  }
+}
+
+class NotificationController {
+  @pragma("vm:entry-point")
+  static Future<void> onNotificationCreatedMethod(
+      ReceivedNotification receivedNotification) async {}
+
+  @pragma("vm:entry-point")
+  static Future<void> onNotificationDisplayedMethod(
+      ReceivedNotification receivedNotification) async {}
+
+  @pragma("vm:entry-point")
+  static Future<void> onDismissActionReceivedMethod(
+      ReceivedAction receivedAction) async {}
+
+  @pragma("vm:entry-point")
+  static Future<void> onActionReceivedMethod(
+      ReceivedAction receivedAction) async {
+    Get.toNamed(Routes.HOME);
   }
 }

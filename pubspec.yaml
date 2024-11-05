@@ -19,8 +19,8 @@ dependencies:
   flutter_inappwebview: ^6.1.5
   dio: ^5.7.0
   web_socket_channel: ^3.0.1
-  flutter_local_notifications: ^18.0.0
   flutter_native_splash: ^2.4.2
+  awesome_notifications: ^0.10.0
 
 dev_dependencies:
   flutter_test:
