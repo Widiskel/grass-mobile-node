@@ -11,6 +11,7 @@
   - [Getting Started](#getting-started)
   - [Developer Note](#developer-note)
   - [Contributing](#contributing)
+  - [Support](#support)
 
 
 ## Overview
@@ -47,3 +48,13 @@ Make sure your development environment is set up accordingly to ensure a smooth 
 ## Contributing
 
 If you'd like to contribute to Grass Mobile Node's development, feel free to submit pull requests or open issues. Contributions are welcome and appreciated!
+
+
+## Support
+
+If you would like to support me, consider buy me a coffee to the following wallets:
+
+EVM: 0x1f0ea6e0b3590e1ab6c12ea0a24d3d0d9bf7707d
+Solana: 3tE3Hs7P2wuRyVxyMD7JSf8JTAmEekdNsQWqAnayE1CN
+
+Thanks for your support
