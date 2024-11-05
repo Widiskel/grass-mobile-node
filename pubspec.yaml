@@ -1,0 +1,42 @@
+name: grass
+description: "Grass node extension for mobile"
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  get: ^4.6.6
+  google_fonts: ^6.2.1
+  shared_preferences: ^2.3.2
+  uuid: ^4.5.1
+  flutter_inappwebview: ^6.1.5
+  dio: ^5.7.0
+  web_socket_channel: ^3.0.1
+  flutter_local_notifications: ^18.0.0
+  flutter_native_splash: ^2.4.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+flutter:
+  uses-material-design: true
+  assets:
+    - "assets/img/"
+    - "assets/logos/"
+
+flutter_native_splash:
+  image: "assets/img/grass-logo.png"
+  color: "#ABF600"
+  android_12:
+    image: "assets/img/grass-logo.png"
+    color: "#ABF600"
+
+fullscreen: true

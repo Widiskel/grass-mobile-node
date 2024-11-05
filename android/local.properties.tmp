@@ -1,0 +1,7 @@
+sdk.dir=ANDROID SDK DIR
+flutter.sdk=FLUTTER SDK DIR
+flutter.buildMode=debug
+flutter.versionName=1.0.0
+flutter.versionCode=1
+flutter.minSdkVersion=23
+flutter.targetSdkVersion=33
