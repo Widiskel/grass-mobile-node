@@ -9,7 +9,7 @@ class LocalNotificationService {
 
   void _initializeNotifications() async {
     AwesomeNotifications().initialize(
-      'resource://drawable/ic_notification',
+      null,
       [
         NotificationChannel(
           channelGroupKey: 'grass node',
