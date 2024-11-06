@@ -7,7 +7,7 @@ import '../controllers/home_controller.dart';
 class HomeBinding extends Bindings {
   @override
   void dependencies() {
-    Get.put<NodeController>(NodeController(), permanent: true);
+    Get.find<NodeController>();
     Get.put<WebsiteController>(WebsiteController(), permanent: true);
     Get.put<HomeController>(HomeController(), permanent: true);
   }

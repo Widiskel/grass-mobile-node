@@ -1,19 +1,32 @@
 import 'dart:async';
+import 'dart:isolate';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:grass/app/data/service/grass_service.dart';
+import 'app/modules/node/controllers/node_controller.dart';
 import 'app/routes/app_pages.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   DartPluginRegistrant.ensureInitialized();
   await InAppWebViewController.setWebContentsDebuggingEnabled(true);
+  GrassService().initialize();
+  final NodeController nodeController =
+      Get.put(NodeController(), permanent: true);
+
+  ReceivePort receivePort = ReceivePort();
+  IsolateNameServer.registerPortWithName(receivePort.sendPort, 'node_service');
+
+  receivePort.listen((data) {
+    nodeController.updateFromBackground(data);
+  });
 
   runApp(
     GetMaterialApp(
-      title: "Application",
+      title: "Grass Mobile Node",
       initialRoute: AppPages.INITIAL,
       theme: ThemeData(
         textTheme: GoogleFonts.karlaTextTheme().copyWith(

@@ -72,6 +72,36 @@ class LocalNotificationService {
     );
   }
 
+  Future<void> showDismissableNotification(String body,
+      {String? payload}) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      channelId,
+      channelName,
+      channelDescription: channelDesc,
+      importance: Importance.max,
+      priority: Priority.high,
+      playSound: false,
+      enableVibration: false,
+      showWhen: false,
+      ongoing: false,
+      autoCancel: false,
+      onlyAlertOnce: true,
+      icon: '@drawable/ic_notification',
+    );
+
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+      1,
+      androidPlatformChannelSpecifics.channelName,
+      body,
+      platformChannelSpecifics,
+      payload: payload,
+    );
+  }
+
   Future<void> dismissNotification() async {
     try {
       await flutterLocalNotificationsPlugin.cancel(0);

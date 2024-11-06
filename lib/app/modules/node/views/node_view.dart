@@ -91,7 +91,7 @@ class NodeView extends GetView<NodeController> {
                   )
                 : GestureDetector(
                     onTap: () async {
-                      await controller.wssConnect();
+                      await controller.startBackgroundService();
                     },
                     child: Container(
                       width: Get.width * 0.6,
