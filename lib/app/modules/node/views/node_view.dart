@@ -23,7 +23,7 @@ class NodeView extends GetView<NodeController> {
               height: 10,
             ),
             Text(
-              "${controller.currentStage?.stageName}",
+              controller.currentStage?.stageName ?? "Epoch 2",
               style: Theme.of(context).textTheme.titleSmall,
             ),
             const SizedBox(

@@ -153,6 +153,43 @@ startService(ServiceInstance service) async {
     log("SERVICE WSS : STOPPED");
   });
 
+  service.on("update").listen((event) async {
+    log("SERVICE WSS : UPDATING SERVICE");
+
+    mainSendPort?.send(
+      NodeData(
+        isConnected: false,
+        isConnecting: true,
+        deviceIp: deviceIp,
+        statusText:
+            "You're doing great! Keep conneted to this network to earn.",
+        networkScore: networkQuality,
+      ).toJson(),
+    );
+    if (channel == null) {
+      WebSocketChannel? channel = WebSocketChannel.connect(
+        Uri.parse('wss://proxy2.wynd.network:4444/'),
+      );
+      await channel.ready;
+      await getDeviceIp();
+      await getDeviceIp();
+    } else {
+      await getDeviceIp();
+      await getActiveDevices();
+    }
+    mainSendPort?.send(
+      NodeData(
+        isConnected: true,
+        isConnecting: false,
+        deviceIp: deviceIp,
+        statusText:
+            "You're doing great! Keep conneted to this network to earn.",
+        networkScore: networkQuality,
+      ).toJson(),
+    );
+    log("SERVICE WSS : UPDATED");
+  });
+
   mainSendPort?.send(
     NodeData(
             isConnected: true,
@@ -188,12 +225,12 @@ startService(ServiceInstance service) async {
               "extension_id": "lkbnfiajjmbhnfledhphioinpickokdi",
             },
           });
-          content = "Sending Auth Response";
+          content = "Sending AUTH response";
           log("SERVICE WSS :$content");
           localNotificationService.showNotification(content);
 
           channel?.sink.add(authBody);
-          content = "Auth Response To Sended";
+          content = "AUTH response sended";
           log("SERVICE WSS :$content");
           localNotificationService.showNotification(content);
 
@@ -201,7 +238,7 @@ startService(ServiceInstance service) async {
 
           pingInterval ??=
               Timer.periodic(const Duration(minutes: 2), (timer) async {
-            content = "Sending PING Request";
+            content = "Sending PING request";
             log("SERVICE WSS :$content");
             localNotificationService.showNotification(content);
             Uuid uuid = const Uuid();
@@ -220,6 +257,16 @@ startService(ServiceInstance service) async {
           break;
         case "PONG":
           if (currentDevice == null) await getActiveDevices();
+          mainSendPort?.send(
+            NodeData(
+              isConnected: true,
+              isConnecting: false,
+              deviceIp: deviceIp,
+              statusText:
+                  "You're doing great! Keep conneted to this network to earn.",
+              networkScore: networkQuality,
+            ).toJson(),
+          );
           String pongBody = jsonEncode(
               {"id": msg["id"], "version": "1.0.0", "origin_action": "PONG"});
           channel?.sink.add(pongBody);

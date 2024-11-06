@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
+import 'package:grass/app/data/service/grass_service.dart';
 import 'package:grass/app/routes/app_pages.dart';
 
 class LocalNotificationService {
@@ -39,6 +40,12 @@ class LocalNotificationService {
     final String? payload = notificationResponse.payload;
     if (payload != null) {
       log('Notification payload: $payload');
+      GrassService grassService = GrassService();
+      if (await grassService.service.isRunning()) {
+        grassService.service.invoke("update");
+      } else {
+        grassService.service.invoke("stop");
+      }
       Get.toNamed(Routes.HOME);
     }
   }
