@@ -2,12 +2,16 @@ import 'dart:developer';
 
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:grass/app/data/service/local_notification_service.dart';
 import 'package:grass/app/data/utils/prefs_constant.dart';
 import 'package:grass/app/routes/app_pages.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 class SplashController extends GetxController {
+  final LocalNotificationService localNotificationService =
+      LocalNotificationService();
+
   @override
   void onInit() async {
     super.onInit();

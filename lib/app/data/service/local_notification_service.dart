@@ -8,7 +8,19 @@ class LocalNotificationService {
   }
 
   void _initializeNotifications() async {
+    await AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+      if (!isAllowed) {
+        AwesomeNotifications().requestPermissionToSendNotifications(
+            channelKey: "grass",
+            permissions: [
+              NotificationPermission.Alert,
+              NotificationPermission.Badge,
+            ]);
+      }
+    });
+
     AwesomeNotifications().initialize(
+      // 'resource://drawable/ic_notification',
       null,
       [
         NotificationChannel(
@@ -23,17 +35,6 @@ class LocalNotificationService {
       ],
       debug: true,
     );
-
-    await AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
-      if (!isAllowed) {
-        AwesomeNotifications().requestPermissionToSendNotifications(
-            channelKey: "grass",
-            permissions: [
-              NotificationPermission.Alert,
-              NotificationPermission.Badge,
-            ]);
-      }
-    });
 
     AwesomeNotifications().setListeners(
       onActionReceivedMethod: NotificationController.onActionReceivedMethod,
