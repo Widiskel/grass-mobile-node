@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:grass/app/data/models/active_device_list_model.dart';
 import 'package:grass/app/data/models/api_response.dart';
@@ -14,6 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import '../../../data/models/stage_list_model.dart';
+import '../../../data/service/grass_service.dart';
 
 class NodeController extends GetxController {
   GrassRepository grassRepository = GrassRepository();
@@ -35,11 +37,13 @@ class NodeController extends GetxController {
       LocalNotificationService();
   ActiveDevices? currentDevice;
   int pongCount = 0;
+  GrassService grassService = GrassService();
 
   @override
   void onInit() async {
     super.onInit();
     prefs = await SharedPreferences.getInstance();
+    await grassService.initialize();
     await getDeviceIp();
     await getEpochStage();
   }
@@ -92,7 +96,7 @@ class NodeController extends GetxController {
     connectionText = "Connecting to Grass Server...!";
     isConnecting = true;
     update();
-    localNotificationService.showNotification("Connecting to Grass Server...!");
+    updateServiceContent("Connecting to Grass Server...!");
 
     channel = WebSocketChannel.connect(
       Uri.parse('wss://proxy2.wynd.network:4444/'),
@@ -102,7 +106,7 @@ class NodeController extends GetxController {
     isConnected = true;
     connectionText =
         "You’re doing great! Keep connected to this network to earn.";
-    localNotificationService.showNotification(
+    updateServiceContent(
         "Connected. You’re doing great! Keep connected to this network to earn.");
     update();
 
@@ -113,8 +117,7 @@ class NodeController extends GetxController {
       onError: (error) {
         log("WSS WebSocket Error: $error");
         connectionText = "Connection error. Attempting to reconnect...";
-        localNotificationService
-            .showNotification("Connection error. Attempting to reconnect...");
+        updateServiceContent("Connection error. Attempting to reconnect...");
         isConnecting = false;
         isConnected = false;
         deviceIp = null;
@@ -126,14 +129,14 @@ class NodeController extends GetxController {
       },
       onDone: () {
         log("WSS WebSocket connection closed.");
-        localNotificationService.showNotification("Disconnecting....");
+        updateServiceContent("Disconnecting....");
         connectionText = "Connect to start earning.";
         isConnecting = false;
         isConnected = false;
         deviceIp = null;
         networkQuality = 0;
         currentDevice = null;
-        localNotificationService.dismissNotification();
+        updateServiceContent("Disconnected");
         update();
       },
     );
@@ -141,7 +144,7 @@ class NodeController extends GetxController {
 
   Future<void> handleMessage(dynamic message) async {
     log("WSS Receiving message: $message");
-    localNotificationService.showNotification("Receiving Message : $message");
+    updateServiceContent("Receiving Message : $message");
     Map<String, dynamic> msg = jsonDecode(message);
     String action = msg["action"];
 
@@ -191,7 +194,7 @@ class NodeController extends GetxController {
       "data": {},
     };
     await sendMessage(jsonEncode(res));
-    localNotificationService.showNotification("PING Message sended");
+    updateServiceContent("PING Message sended");
   }
 
   void stopPing() {
@@ -210,16 +213,15 @@ class NodeController extends GetxController {
     };
     await sendMessage(jsonEncode(res));
     pongCount += 1;
-    localNotificationService
-        .showNotification("You has response $pongCount x PONG");
+    updateServiceContent("You has response $pongCount x PONG");
   }
 
   Future<void> sendMessage(String message) async {
-    localNotificationService.showNotification("Sending Message : $message");
+    updateServiceContent("Sending Message : $message");
     if (channel != null && isConnected) {
       channel?.sink.add(message);
       log("WSS Sent message: $message");
-      localNotificationService.showNotification("Message sent : $message");
+      updateServiceContent("Message sent : $message");
       if (currentDevice == null) {
         await getActiveDevices();
       }
@@ -235,25 +237,79 @@ class NodeController extends GetxController {
       _retryCount++;
       _reconnectTimer = Timer(Duration(seconds: _reconnectInterval), () {
         log("WSS Reconnection attempt #$_retryCount");
-        localNotificationService
-            .showNotification("Reconnect attemnt $_retryCount");
+        updateServiceContent("Reconnect attemnt $_retryCount");
         wssConnect();
       });
     } else {
       log("WSS Max reconnection attempts reached. Unable to reconnect.");
-      localNotificationService.showNotification(
+      updateServiceContent(
           "Max reconnection attempts reached. Unable to reconnect");
       connectionText = "Connection lost. Please retry manually.";
       update();
     }
   }
 
-  void closeConnection() {
+  Future<void> startBackgroundService() async {
+    bool? isBatteryOptimizationDisabled =
+        await grassService.requestDisableBatteryOptimization();
+
+    if (isBatteryOptimizationDisabled != true) {
+      bool userConsent = await showBatteryOptimizationDialog();
+
+      if (!userConsent) {
+        return;
+      }
+    }
+
+    if (await grassService.service.isRunning()) {
+      grassService.service.invoke("stop");
+    }
+    await grassService.service.startService();
+    await wssConnect();
+    update();
+  }
+
+  Future<bool> showBatteryOptimizationDialog() async {
+    bool userConsent = false;
+    await Get.dialog(
+      AlertDialog(
+        title: const Text("Battery Optimization Enabled"),
+        content: const Text(
+            "Running the app with battery optimization may stop the service when minimized. Do you want to proceed anyway?"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              userConsent = false;
+              Get.back();
+            },
+            child: const Text("No"),
+          ),
+          TextButton(
+            onPressed: () {
+              userConsent = true;
+              Get.back();
+            },
+            child: const Text("Yes"),
+          ),
+        ],
+      ),
+    );
+    return userConsent;
+  }
+
+  updateServiceContent(msg) async {
+    if (await grassService.service.isRunning()) {
+      grassService.service.invoke("update", {"content": msg});
+    }
+  }
+
+  void stopBackgroundService() async {
     _reconnectTimer?.cancel();
     if (channel != null) {
       channel?.sink.close();
       isConnected = false;
       connectionText = "Connect to start earning.";
+      grassService.service.invoke("stop");
       update();
     }
   }
